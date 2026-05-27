@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .dashboard {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .clock {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .clock .time {
+      font-size: 4.5rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      line-height: 1.1;
+    }
+
+    .clock .date {
+      font-size: 1.25rem;
+      color: #8b949e;
+      margin-top: 0.25rem;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #58a6ff;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .link-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-decoration: none;
+      color: #e6edf3;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .link-card:hover {
+      border-color: #58a6ff;
+      background: #1c2128;
+    }
+
+    .link-card .name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .link-card .desc {
+      font-size: 0.8rem;
+      color: #8b949e;
+    }
+
+    .sysinfo {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .sysinfo-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #21262d;
+      font-size: 0.9rem;
+    }
+
+    .sysinfo-row:last-child { border-bottom: none; }
+
+    .sysinfo-row .label { color: #8b949e; }
+    .sysinfo-row .value  { font-weight: 500; }
+
+    @media (max-width: 480px) {
+      .clock .time { font-size: 3rem; }
+      .links-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Clock -->
+    <div class="clock">
+      <div class="time" id="time">--:--:--</div>
+      <div class="date" id="date">---</div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="section-title">Quick Links</div>
+    <div class="links-grid" id="links">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- System Info -->
+    <div class="section-title">System Info</div>
+    <div class="sysinfo" id="sysinfo">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // ---- Quick Links ----
+      const links = [
+        { name: 'GitHub',        desc: 'Repositories & PRs',     url: 'https://github.com' },
+        { name: 'Docker Hub',    desc: 'Container registry',     url: 'https://hub.docker.com' },
+        { name: 'CI / CD',       desc: 'Build pipelines',        url: 'https://github.com/sekai-dev-team/cc-demo-dashboard/actions' },
+        { name: 'Dev Docs',      desc: 'Internal documentation', url: '#' },
+      ];
+
+      const linksEl = document.getElementById('links');
+      linksEl.innerHTML = links.map(l => `
+        <a class="link-card" href="${l.url}" target="_blank" rel="noopener noreferrer">
+          <span class="name">${l.name}</span>
+          <span class="desc">${l.desc}</span>
+        </a>
+      `).join('');
+
+      // ---- System Info (static demo) ----
+      const sysEl = document.getElementById('sysinfo');
+      const info = [
+        { label: 'Hostname', value: 'cc-demo-node-1' },
+        { label: 'Uptime',   value: '14d 6h 32m' },
+        { label: 'Kernel',   value: 'Linux 6.2.0 (x86_64)' },
+        { label: 'Region',   value: 'us-east-1' },
+      ];
+      sysEl.innerHTML = info.map(i => `
+        <div class="sysinfo-row">
+          <span class="label">${i.label}</span>
+          <span class="value">${i.value}</span>
+        </div>
+      `).join('');
+
+      // ---- Real-time Clock ----
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function updateClock() {
+        const now = new Date();
+        const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const date = now.toLocaleDateString('en-US', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        document.getElementById('time').textContent = time;
+        document.getElementById('date').textContent = date;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    })();
+  </script>
+</body>
+</html>
